@@ -18,6 +18,9 @@ export interface LocationData {
   grapStage: 1 | 2 | 3 | 4; // Graded Response Action Plan
   primarySources: string[];
   lastUpdated: string;
+  latitude?: number;
+  longitude?: number;
+  isLive?: boolean;
   hourlyForecast: {
     hour: string;
     aqi: number;

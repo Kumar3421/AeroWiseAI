@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './components/Navbar';
 import { AQIOverviewHeader } from './components/AQIOverviewHeader';
 import { ChatAssistant } from './components/ChatAssistant';
@@ -16,6 +16,7 @@ import { ExportReportModal } from './components/ExportReportModal';
 
 import { LocationData, FamilyProfile } from './types';
 import { MOCK_LOCATIONS, DEFAULT_FAMILY_PROFILE } from './data/mockData';
+import { fetchLiveAirAndWeather, CITY_COORDINATES } from './services/weatherService';
 import { Wind, Heart, Sparkles, ShieldCheck } from 'lucide-react';
 
 const PROFILE_STORAGE_KEY = 'aerowise_family_profile';
@@ -25,6 +26,8 @@ const ADOPTED_SWAPS_KEY = 'aerowise_adopted_swaps';
 export function App() {
   const [locations, setLocations] = useState<LocationData[]>(MOCK_LOCATIONS);
   const [currentLocation, setCurrentLocation] = useState<LocationData>(MOCK_LOCATIONS[0]);
+  const [isLiveLoading, setIsLiveLoading] = useState<boolean>(false);
+  const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
   
   // Family profile with local storage persistence
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(() => {
@@ -53,9 +56,57 @@ export function App() {
   const [isCitySearchOpen, setIsCitySearchOpen] = useState<boolean>(false);
   const [isExportReportOpen, setIsExportReportOpen] = useState<boolean>(false);
 
+  // Sync live data for a location
+  const syncLiveData = useCallback(async (loc: LocationData) => {
+    const lat = loc.latitude || CITY_COORDINATES[loc.id]?.lat;
+    const lon = loc.longitude || CITY_COORDINATES[loc.id]?.lon;
+    if (!lat || !lon) return; // No coordinates, keep mock data
+    
+    setIsLiveLoading(true);
+    try {
+      const liveData = await fetchLiveAirAndWeather(
+        lat, lon, loc.name, loc.country, loc.region
+      );
+      // Merge live data into location, preserving id and primarySources from mock if available
+      const merged: LocationData = {
+        ...liveData,
+        id: loc.id,
+        name: loc.name,
+        primarySources: loc.primarySources.length > 2 ? loc.primarySources : liveData.primarySources,
+      };
+      setCurrentLocation(merged);
+      setIsLiveMode(true);
+      // Also update this location in the locations array
+      setLocations(prev => prev.map(l => l.id === loc.id ? merged : l));
+    } catch (err) {
+      console.error('Live data sync failed, keeping cached data:', err);
+    } finally {
+      setIsLiveLoading(false);
+    }
+  }, []);
+
+  // Auto-sync live data on first mount
+  useEffect(() => {
+    syncLiveData(MOCK_LOCATIONS[0]);
+  }, [syncLiveData]);
+
+  const handleSyncLive = useCallback(() => {
+    syncLiveData(currentLocation);
+  }, [currentLocation, syncLiveData]);
+
+  const handleSelectLocation = useCallback((loc: LocationData) => {
+    setCurrentLocation(loc);
+    setIsLiveMode(false);
+    // Auto-sync live data when switching cities
+    syncLiveData(loc);
+  }, [syncLiveData]);
+
   const handleAddAndSelectCity = (newCity: LocationData) => {
     setLocations((prev) => [newCity, ...prev]);
     setCurrentLocation(newCity);
+    if (newCity.isLive) {
+      setIsLiveMode(true);
+    }
   };
 
   // Sync to local storage
@@ -92,7 +143,7 @@ export function App() {
       <Navbar
         currentLocation={currentLocation}
         allLocations={locations}
-        onSelectLocation={setCurrentLocation}
+        onSelectLocation={handleSelectLocation}
         familyProfile={familyProfile}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -101,6 +152,9 @@ export function App() {
         onOpenGrapModal={() => setIsGrapModalOpen(true)}
         onOpenCitySearch={() => setIsCitySearchOpen(true)}
         onOpenExportReport={() => setIsExportReportOpen(true)}
+        onSyncLive={handleSyncLive}
+        isLiveLoading={isLiveLoading}
+        isLiveMode={isLiveMode}
       />
 
       {/* Hyperlocal Smog Status Header Banner */}
@@ -172,19 +226,19 @@ export function App() {
             <div>
               <span className="font-bold text-slate-200">AeroWise AI</span> — Winter Smog & Community Clean Air Copilot
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Powered by Google Gemini GenAI & Atmospheric Fluid Dynamics Models
+                Powered by Google Gemini GenAI • Open-Meteo Live Atmospheric Data • WHO Air Quality Guidelines
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400">
-            <span>Berkeley Earth Particle Metrics</span>
+            <span>Open-Meteo Atmospheric Network</span>
             <span>•</span>
-            <span>WHO Air Quality Guidelines 2021</span>
+            <span>Berkeley Earth Particle Metrics</span>
             <span>•</span>
             <span>Corsi-Rosenthal Foundation CADR Standards</span>
             <span>•</span>
-            <span>Graded Response Action Plan (GRAP) Stage IV</span>
+            <span>GRAP Stage IV Protocols</span>
           </div>
         </div>
       </footer>

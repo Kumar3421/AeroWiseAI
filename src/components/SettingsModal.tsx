@@ -8,9 +8,12 @@ import {
   AlertCircle, 
   ShieldCheck, 
   Trash2,
-  ExternalLink
+  ExternalLink,
+  MapPin,
+  Globe
 } from 'lucide-react';
 import { getStoredApiKey, setStoredApiKey } from '../services/geminiService';
+import { getStoredGoogleMapsKey, setStoredGoogleMapsKey } from '../services/weatherService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -24,6 +27,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onApiKeyUpdated,
 }) => {
   const [keyInput, setKeyInput] = useState<string>(getStoredApiKey());
+  const [mapsKeyInput, setMapsKeyInput] = useState<string>(getStoredGoogleMapsKey());
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [isTesting, setIsTesting] = useState<boolean>(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -63,6 +67,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setStoredApiKey(keyInput);
+    setStoredGoogleMapsKey(mapsKeyInput);
     setSaveSuccess(true);
     onApiKeyUpdated();
     setTimeout(() => {
@@ -74,12 +79,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleClear = () => {
     setKeyInput('');
     setStoredApiKey('');
+    setMapsKeyInput('');
+    setStoredGoogleMapsKey('');
     onApiKeyUpdated();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="glass-panel border border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-6 shadow-2xl">
+      <div className="glass-panel border border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2">
@@ -91,7 +98,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 AeroWise AI Settings & API Engine
               </h3>
               <p className="text-xs text-slate-400">
-                Configure Gemini API access or run the built-in expert engine.
+                Configure Gemini AI and live weather data sources.
               </p>
             </div>
           </div>
@@ -128,6 +135,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* API Key Form */}
         <form onSubmit={handleSave} className="space-y-4 text-xs">
+          {/* Gemini API Key */}
           <div>
             <label className="text-slate-300 block mb-1 font-semibold flex items-center gap-1.5">
               <Key className="w-3.5 h-3.5 text-cyan-400" />
@@ -142,7 +150,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             />
             <div className="flex items-center justify-between mt-1.5">
               <p className="text-[10px] text-slate-500">
-                Saved strictly in your browser (`localStorage`).
+                Powers the AI Smog Copilot chat with live Gemini reasoning.
               </p>
               <button
                 type="button"
@@ -166,10 +174,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
+          {/* Google Maps / Air Quality API Key */}
+          <div className="pt-2 border-t border-slate-800/60">
+            <label className="text-slate-300 block mb-1 font-semibold flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-teal-400" />
+              <span>Google Maps Platform API Key (Optional):</span>
+            </label>
+            <input
+              type="password"
+              value={mapsKeyInput}
+              onChange={(e) => setMapsKeyInput(e.target.value)}
+              placeholder="AIzaSy... (Air Quality API enabled)"
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200 outline-none focus:border-teal-500 font-mono"
+            />
+            <div className="mt-1.5 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/60">
+              <p className="text-[10px] text-slate-500 leading-relaxed">
+                <strong className="text-teal-400">Not required!</strong> AeroWise AI uses <strong className="text-slate-300">Open-Meteo</strong> (free, no key) for live weather, AQI, PM2.5, and hourly forecasts by default. 
+                Adding a Google Maps Platform key with the <em>Air Quality API</em> enabled provides premium Google-sourced pollutant data as an optional upgrade.
+              </p>
+            </div>
+          </div>
+
           {saveSuccess && (
             <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-600/40 text-emerald-300 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Settings and API key saved successfully!</span>
+              <span>All settings saved successfully!</span>
             </div>
           )}
 
@@ -181,7 +210,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className="text-slate-400 hover:text-rose-400 flex items-center gap-1 transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Clear Key</span>
+              <span>Clear All Keys</span>
             </button>
 
             <div className="flex items-center gap-2">

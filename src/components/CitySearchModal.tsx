@@ -7,9 +7,13 @@ import {
   Sparkles, 
   Wind, 
   CheckCircle2, 
-  AlertTriangle 
+  AlertTriangle,
+  Loader2,
+  Radio,
+  Globe
 } from 'lucide-react';
 import { LocationData } from '../types';
+import { searchCityCoordinates, fetchLiveAirAndWeather } from '../services/weatherService';
 
 interface CitySearchModalProps {
   isOpen: boolean;
@@ -18,14 +22,14 @@ interface CitySearchModalProps {
 }
 
 const GLOBAL_SMOG_PRESETS = [
-  { name: 'Kolkata', region: 'West Bengal', country: 'India', aqi: 310, pm25: 260, temp: 18, inversion: 'High' },
-  { name: 'Kathmandu', region: 'Kathmandu Valley', country: 'Nepal', aqi: 240, pm25: 190, temp: 8, inversion: 'Severe Inversion Trapped' },
-  { name: 'Ulaanbaatar', region: 'Tuul River Basin', country: 'Mongolia', aqi: 420, pm25: 350, temp: -16, inversion: 'Severe Inversion Trapped' },
-  { name: 'Bangkok', region: 'Central Plain', country: 'Thailand', aqi: 175, pm25: 85, temp: 26, inversion: 'Moderate' },
-  { name: 'Milan', region: 'Po Valley', country: 'Italy', aqi: 165, pm25: 82, temp: 4, inversion: 'High' },
-  { name: 'Tehran', region: 'Alborz Foot', country: 'Iran', aqi: 280, pm25: 220, temp: 7, inversion: 'Severe Inversion Trapped' },
-  { name: 'Mumbai', region: 'Coastal Basin', country: 'India', aqi: 195, pm25: 110, temp: 24, inversion: 'Moderate' },
-  { name: 'Almaty', region: 'Zailiysky Alatau', country: 'Kazakhstan', aqi: 260, pm25: 205, temp: -5, inversion: 'Severe Inversion Trapped' },
+  { name: 'Kolkata', region: 'West Bengal', country: 'India', lat: 22.5726, lon: 88.3639 },
+  { name: 'Kathmandu', region: 'Kathmandu Valley', country: 'Nepal', lat: 27.7172, lon: 85.3240 },
+  { name: 'Ulaanbaatar', region: 'Tuul River Basin', country: 'Mongolia', lat: 47.9184, lon: 106.9177 },
+  { name: 'Bangkok', region: 'Central Plain', country: 'Thailand', lat: 13.7563, lon: 100.5018 },
+  { name: 'Milan', region: 'Po Valley', country: 'Italy', lat: 45.4642, lon: 9.1900 },
+  { name: 'Tehran', region: 'Alborz Foot', country: 'Iran', lat: 35.6892, lon: 51.3890 },
+  { name: 'Mumbai', region: 'Coastal Basin', country: 'India', lat: 19.0760, lon: 72.8777 },
+  { name: 'Almaty', region: 'Zailiysky Alatau', country: 'Kazakhstan', lat: 43.2220, lon: 76.8512 },
 ];
 
 export const CitySearchModal: React.FC<CitySearchModalProps> = ({
@@ -35,76 +39,58 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
 }) => {
   const [query, setQuery] = useState<string>('');
   const [customCountry, setCustomCountry] = useState<string>('');
-  const [estimatedAQI, setEstimatedAQI] = useState<number>(275);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string>('');
 
   if (!isOpen) return null;
 
-  const handleSelectPreset = (preset: typeof GLOBAL_SMOG_PRESETS[0]) => {
-    const newLocation: LocationData = {
-      id: `loc-${Date.now()}`,
-      name: `${preset.name} - Urban Center`,
-      region: preset.region,
-      country: preset.country,
-      aqi: preset.aqi,
-      pm25: preset.pm25,
-      pm10: Math.round(preset.pm25 * 1.4),
-      no2: Math.round(preset.pm25 * 0.22),
-      so2: Math.round(preset.pm25 * 0.08),
-      co: Number((preset.pm25 * 0.009).toFixed(1)),
-      temperature: preset.temp,
-      humidity: 72,
-      windSpeed: 3.5,
-      inversionRisk: preset.inversion as any,
-      grapStage: preset.aqi > 400 ? 4 : preset.aqi > 300 ? 3 : preset.aqi > 200 ? 2 : 1,
-      primarySources: ['Vehicular exhaust', 'Local heating & biomass', 'Thermal boundary stagnation', 'Suspended road dust'],
-      lastUpdated: 'Just now',
-      hourlyForecast: [
-        { hour: '06:00', aqi: Math.round(preset.aqi * 1.15), pm25: Math.round(preset.pm25 * 1.15), inversionTrap: true, safeToVentilate: false, commuteSafety: 'dangerous' },
-        { hour: '09:00', aqi: Math.round(preset.aqi * 1.1), pm25: Math.round(preset.pm25 * 1.1), inversionTrap: true, safeToVentilate: false, commuteSafety: 'dangerous' },
-        { hour: '13:00', aqi: Math.round(preset.aqi * 0.72), pm25: Math.round(preset.pm25 * 0.72), inversionTrap: false, safeToVentilate: true, commuteSafety: 'caution' },
-        { hour: '17:00', aqi: Math.round(preset.aqi * 0.95), pm25: Math.round(preset.pm25 * 0.95), inversionTrap: false, safeToVentilate: false, commuteSafety: 'caution' },
-        { hour: '21:00', aqi: Math.round(preset.aqi * 1.08), pm25: Math.round(preset.pm25 * 1.08), inversionTrap: true, safeToVentilate: false, commuteSafety: 'dangerous' },
-      ],
-    };
-
-    onAddAndSelectCity(newLocation);
-    onClose();
+  const handleSelectPreset = async (preset: typeof GLOBAL_SMOG_PRESETS[0]) => {
+    setIsSearching(true);
+    setSearchError('');
+    try {
+      const liveData = await fetchLiveAirAndWeather(
+        preset.lat, preset.lon,
+        `${preset.name} - Urban Center`,
+        preset.country, preset.region
+      );
+      onAddAndSelectCity(liveData);
+      onClose();
+    } catch (err) {
+      setSearchError(`Failed to fetch live data for ${preset.name}. Try again.`);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
-  const handleCreateCustom = (e: React.FormEvent) => {
+  const handleCreateCustom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-
-    const pm25 = Math.round(estimatedAQI * 0.82);
-    const newLocation: LocationData = {
-      id: `custom-${Date.now()}`,
-      name: query.trim(),
-      region: 'Metropolitan Airshed',
-      country: customCountry.trim() || 'Global',
-      aqi: estimatedAQI,
-      pm25: pm25,
-      pm10: Math.round(pm25 * 1.45),
-      no2: Math.round(pm25 * 0.24),
-      so2: Math.round(pm25 * 0.08),
-      co: 2.1,
-      temperature: 8,
-      humidity: 75,
-      windSpeed: 3.2,
-      inversionRisk: estimatedAQI > 300 ? 'Severe Inversion Trapped' : estimatedAQI > 180 ? 'High' : 'Moderate',
-      grapStage: estimatedAQI > 400 ? 4 : estimatedAQI > 300 ? 3 : estimatedAQI > 200 ? 2 : 1,
-      primarySources: ['Local traffic exhaust', 'Winter boundary stagnation', 'Heating emissions'],
-      lastUpdated: 'Just now (Simulated)',
-      hourlyForecast: [
-        { hour: '06:00', aqi: Math.round(estimatedAQI * 1.12), pm25: Math.round(pm25 * 1.12), inversionTrap: true, safeToVentilate: false, commuteSafety: 'dangerous' },
-        { hour: '10:00', aqi: Math.round(estimatedAQI * 1.05), pm25: Math.round(pm25 * 1.05), inversionTrap: true, safeToVentilate: false, commuteSafety: 'caution' },
-        { hour: '14:00', aqi: Math.round(estimatedAQI * 0.7), pm25: Math.round(pm25 * 0.7), inversionTrap: false, safeToVentilate: true, commuteSafety: 'caution' },
-        { hour: '18:00', aqi: Math.round(estimatedAQI * 0.98), pm25: Math.round(pm25 * 0.98), inversionTrap: false, safeToVentilate: false, commuteSafety: 'caution' },
-        { hour: '22:00', aqi: Math.round(estimatedAQI * 1.1), pm25: Math.round(pm25 * 1.1), inversionTrap: true, safeToVentilate: false, commuteSafety: 'dangerous' },
-      ],
-    };
-
-    onAddAndSelectCity(newLocation);
-    onClose();
+    
+    setIsSearching(true);
+    setSearchError('');
+    
+    try {
+      // Use geocoding API to find real coordinates
+      const geo = await searchCityCoordinates(query.trim());
+      
+      if (geo) {
+        // Fetch live data using real coordinates
+        const liveData = await fetchLiveAirAndWeather(
+          geo.latitude, geo.longitude,
+          `${geo.name} - ${geo.region}`,
+          customCountry.trim() || geo.country,
+          geo.region
+        );
+        onAddAndSelectCity(liveData);
+        onClose();
+      } else {
+        setSearchError(`Could not find "${query}". Try a different city name.`);
+      }
+    } catch (err) {
+      setSearchError('Network error while searching. Please check your connection.');
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -121,7 +107,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
                 Search or Add Hyperlocal Location
               </h3>
               <p className="text-xs text-slate-400">
-                Monitor winter smog, inversion trapping, and tailored routines for any city.
+                Monitor live air quality, inversion trapping, and tailored routines for any city.
               </p>
             </div>
           </div>
@@ -131,6 +117,14 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Live Data Badge */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs">
+          <Radio className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-emerald-300 font-medium">
+            Cities are auto-populated with real-time AQI, weather, and hourly forecast from Open-Meteo Atmospheric Network.
+          </span>
         </div>
 
         {/* Custom City Form */}
@@ -145,71 +139,68 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
                 placeholder="e.g. Kolkata, Hanoi, Chicago..."
                 className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-500"
                 required
+                disabled={isSearching}
               />
             </div>
             <div>
-              <label className="text-slate-400 block mb-1 font-semibold">Country / State:</label>
+              <label className="text-slate-400 block mb-1 font-semibold">Country / State (Optional):</label>
               <input
                 type="text"
                 value={customCountry}
                 onChange={(e) => setCustomCountry(e.target.value)}
                 placeholder="e.g. India, Vietnam, USA..."
                 className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-500"
+                disabled={isSearching}
               />
             </div>
           </div>
 
-          <div>
-            <div className="flex justify-between text-xs text-slate-400 mb-1">
-              <span>Estimated Current Winter AQI:</span>
-              <strong className="text-cyan-400">{estimatedAQI} AQI</strong>
+          {searchError && (
+            <div className="p-3 rounded-xl bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>{searchError}</span>
             </div>
-            <input
-              type="range"
-              min="50"
-              max="550"
-              step="5"
-              value={estimatedAQI}
-              onChange={(e) => setEstimatedAQI(Number(e.target.value))}
-              className="w-full accent-cyan-400 cursor-pointer"
-            />
-            <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-              <span>Moderate (50)</span>
-              <span>Severe Inversion (350)</span>
-              <span>Emergency (550)</span>
-            </div>
-          </div>
+          )}
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold transition-all shadow-md shadow-cyan-600/20 flex items-center justify-center gap-1.5"
+            disabled={isSearching}
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold transition-all shadow-md shadow-cyan-600/20 flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add & Navigate to This City</span>
+            {isSearching ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Fetching Live Data...</span>
+              </>
+            ) : (
+              <>
+                <Globe className="w-4 h-4" />
+                <span>Search & Add with Live Air Quality</span>
+              </>
+            )}
           </button>
         </form>
 
         {/* Global Smog Basins Presets */}
         <div className="space-y-2 border-t border-slate-800/80 pt-4 text-xs">
           <span className="text-slate-400 font-semibold block text-[11px] uppercase tracking-wider">
-            Quick Select Global Winter Inversion Basins:
+            Quick Select Global Winter Inversion Basins (Live Data):
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {GLOBAL_SMOG_PRESETS.map((p, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSelectPreset(p)}
-                className="p-2.5 rounded-xl bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 text-left transition-all group"
+                disabled={isSearching}
+                className="p-2.5 rounded-xl bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 text-left transition-all group disabled:opacity-50"
               >
                 <div className="font-bold text-slate-200 group-hover:text-cyan-300">
                   {p.name}
                 </div>
                 <div className="text-[10px] text-slate-400">{p.country}</div>
-                <div className="mt-1 flex items-center justify-between text-[10px]">
-                  <span className={p.aqi > 300 ? 'text-rose-400 font-bold' : 'text-amber-400 font-bold'}>
-                    AQI {p.aqi}
-                  </span>
-                  <span className="text-slate-500">{p.temp}°C</span>
+                <div className="mt-1 flex items-center gap-1 text-[10px]">
+                  <Radio className="w-2.5 h-2.5 text-emerald-400" />
+                  <span className="text-emerald-400 font-medium">Live</span>
                 </div>
               </button>
             ))}

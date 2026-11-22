@@ -13,7 +13,10 @@ import {
   BarChart3, 
   Flame,
   Search,
-  FileText
+  FileText,
+  RefreshCw,
+  Radio,
+  Loader2
 } from 'lucide-react';
 import { LocationData, FamilyProfile } from '../types';
 import { getAQIColorClasses, getAQILabel } from '../utils/airQualityUtils';
@@ -30,6 +33,9 @@ interface NavbarProps {
   onOpenGrapModal: () => void;
   onOpenCitySearch: () => void;
   onOpenExportReport: () => void;
+  onSyncLive?: () => void;
+  isLiveLoading?: boolean;
+  isLiveMode?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -44,6 +50,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenGrapModal,
   onOpenCitySearch,
   onOpenExportReport,
+  onSyncLive,
+  isLiveLoading = false,
+  isLiveMode = false,
 }) => {
   const aqiColors = getAQIColorClasses(currentLocation.aqi);
   const aqiLabel = getAQILabel(currentLocation.aqi);
@@ -157,6 +166,29 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="hidden sm:inline">Add City</span>
           </button>
 
+          {/* Live Sync Button */}
+          {onSyncLive && (
+            <button
+              onClick={onSyncLive}
+              disabled={isLiveLoading}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                isLiveMode
+                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25'
+                  : 'bg-rose-500/15 text-rose-300 border-rose-500/40 hover:bg-rose-500/25'
+              } ${isLiveLoading ? 'opacity-60 cursor-wait' : ''}`}
+              title="Fetch real-time air quality & weather data"
+            >
+              {isLiveLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : isLiveMode ? (
+                <Radio className="w-3.5 h-3.5" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5" />
+              )}
+              <span>{isLiveLoading ? 'Syncing...' : isLiveMode ? 'Live' : 'Sync Live'}</span>
+            </button>
+          )}
+
           {/* Dynamic AQI Pill */}
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border ${aqiColors.border} ${aqiColors.bg} transition-all`}>
             <div className="text-right">
@@ -173,6 +205,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="text-[10px] text-slate-400">PM2.5: {currentLocation.pm25} µg/m³</div>
             </div>
           </div>
+
+          {/* Live timestamp badge */}
+          {isLiveMode && currentLocation.lastUpdated && (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 font-mono">
+              {currentLocation.lastUpdated}
+            </span>
+          )}
 
           {/* Settings Button */}
           <button
