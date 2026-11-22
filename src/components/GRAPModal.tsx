@@ -3,13 +3,8 @@ import {
   X, 
   ShieldAlert, 
   AlertTriangle, 
-  Car, 
-  Building2, 
-  Flame, 
-  School, 
   Home, 
-  CheckCircle2, 
-  Info 
+  CheckCircle2
 } from 'lucide-react';
 import { LocationData, FamilyProfile } from '../types';
 import { GRAP_EMERGENCY_PROTOCOLS } from '../data/mockData';
@@ -37,47 +32,49 @@ export const GRAPModal: React.FC<GRAPModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="glass-panel border border-slate-800 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              <ShieldAlert className="w-5 h-5" />
-            </span>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <span>Graded Response Action Plan (GRAP) Protocol</span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      <div className="glass-panel border border-white/10 rounded-[24px] w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl animate-mac-pop">
+        {/* macOS Window Titlebar */}
+        <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08]">
+          <div className="flex items-center gap-3">
+            <div className="mac-traffic-lights">
+              <button type="button" onClick={onClose} className="mac-dot mac-dot-close" title="Close" />
+              <span className="mac-dot mac-dot-minimize" />
+              <span className="mac-dot mac-dot-maximize" />
+            </div>
+            <div className="flex items-center gap-2 ml-2">
+              <span className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                <ShieldAlert className="w-4 h-4" />
+              </span>
+              <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                <span>GRAP Emergency Action Plan</span>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                  Stage {location.grapStage} Active in {location.name}
+                  Stage {location.grapStage} Active
                 </span>
               </h3>
-              <p className="text-xs text-slate-400">
-                Statutory winter emergency controls to avert public health catastrophe.
-              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Current Status Alert Banner */}
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/50 via-slate-900 to-amber-950/40 border border-rose-600/40 space-y-2">
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/50 via-slate-900 to-amber-950/40 border border-rose-600/40 space-y-2 shadow-sm">
           <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase tracking-wider">
             <AlertTriangle className="w-4 h-4" />
             <span>Emergency Enforcement Order: Stage {location.grapStage} Active</span>
           </div>
           <p className="text-xs text-slate-200 leading-relaxed">
-            Due to current severe meteorological stagnation (AQI: <strong className="text-rose-400">{location.aqi}</strong>, PM2.5: <strong className="text-rose-400">{location.pm25} µg/m³</strong>), public authorities enforce mandatory commercial and transport restrictions.
+            Due to current severe meteorological stagnation (AQI: <strong className="text-rose-400">{location.aqi}</strong>, PM2.5: <strong className="text-rose-400">{location.pm25} µg/m³</strong>), public authorities enforce mandatory commercial and transport restrictions in {location.name}.
           </p>
         </div>
 
         {/* Stage Tabs / Details Accordion */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {stages.map((st) => {
             const isCurrent = location.grapStage === st.num;
             return (
@@ -86,7 +83,7 @@ export const GRAPModal: React.FC<GRAPModalProps> = ({
                 className={`p-4 rounded-2xl border transition-all ${
                   isCurrent
                     ? 'bg-rose-950/20 border-rose-500/60 shadow-lg shadow-rose-950/20'
-                    : 'bg-slate-900/60 border-slate-800 opacity-80'
+                    : 'bg-slate-900/60 border-white/5 opacity-80'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -111,7 +108,7 @@ export const GRAPModal: React.FC<GRAPModalProps> = ({
                   {st.actionItems.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-2 p-2 rounded-xl bg-slate-900/90 border border-slate-800/80 text-slate-300"
+                      className="flex items-start gap-2 p-2 rounded-xl bg-slate-900/90 border border-white/5 text-slate-300"
                     >
                       <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${
                         isCurrent ? 'text-rose-400' : 'text-slate-500'
@@ -141,7 +138,7 @@ export const GRAPModal: React.FC<GRAPModalProps> = ({
         <div className="pt-2 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs"
+            className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs active:scale-95 transition-all"
           >
             Close Emergency Protocol
           </button>

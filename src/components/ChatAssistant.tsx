@@ -10,8 +10,6 @@ import {
   Bot, 
   User, 
   Lightbulb, 
-  AlertCircle,
-  ShieldAlert,
   ArrowRight
 } from 'lucide-react';
 import { LocationData, FamilyProfile, ChatMessage } from '../types';
@@ -34,7 +32,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({
     {
       id: 'welcome-msg',
       sender: 'assistant',
-      text: `Hello ${familyProfile.name}! I am **AeroWise AI**, your personal atmospheric health scientist and winter smog navigator.
+      text: `Hello ${familyProfile.name}! I am **AeroWise AI**, your personal atmospheric health scientist and winter smog copilot.
 
 I am analyzing live conditions in **${location.name}** (Current AQI: **${location.aqi}** — **${location.inversionRisk}**).
 
@@ -138,7 +136,6 @@ How can I help you breathe easier today?`,
       setIsSpeaking(null);
     } else {
       window.speechSynthesis.cancel();
-      // Clean markdown tags for audio reading
       const cleanText = text
         .replace(/[*#_`]/g, '')
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
@@ -174,18 +171,23 @@ How can I help you breathe easier today?`,
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
-      {/* Top Engine Pill */}
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 border border-slate-800 rounded-2xl px-4 py-2 text-xs">
-        <div className="flex items-center gap-2">
+      {/* macOS-style Assistant Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/70 border border-white/10 rounded-2xl px-4 py-2.5 text-xs backdrop-blur-xl shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="mac-traffic-lights mr-1 hidden sm:flex">
+            <span className="mac-dot mac-dot-close" />
+            <span className="mac-dot mac-dot-minimize" />
+            <span className="mac-dot mac-dot-maximize" />
+          </div>
           <Sparkles className="w-4 h-4 text-cyan-400" />
-          <span className="font-semibold text-slate-300">GenAI Smog Assistant Engine:</span>
+          <span className="font-semibold text-slate-300">GenAI Smog Copilot:</span>
           {hasCustomApiKey ? (
-            <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded font-mono text-[11px]">
-              Gemini 1.5/2.0 API Connected
+            <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded-full font-mono text-[11px]">
+              Gemini 1.5 Flash Connected
             </span>
           ) : (
-            <span className="text-cyan-400 bg-cyan-950/60 border border-cyan-800/40 px-2 py-0.5 rounded font-mono text-[11px]">
-              Built-in Smog Health AI Active
+            <span className="text-cyan-400 bg-cyan-950/60 border border-cyan-800/40 px-2 py-0.5 rounded-full font-mono text-[11px]">
+              Built-in Smog AI Active
             </span>
           )}
         </div>
@@ -193,14 +195,14 @@ How can I help you breathe easier today?`,
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenSettingsModal}
-            className="text-slate-400 hover:text-cyan-400 text-xs underline underline-offset-2 transition-colors"
+            className="text-slate-400 hover:text-cyan-300 text-xs underline underline-offset-2 transition-colors"
           >
-            {hasCustomApiKey ? 'Configure Key' : 'Add Gemini API Key'}
+            {hasCustomApiKey ? 'Configure Key' : 'Add Gemini Key'}
           </button>
-          <div className="h-3 w-px bg-slate-700" />
+          <div className="h-3 w-px bg-white/10" />
           <button
             onClick={handleClearChat}
-            className="flex items-center gap-1 text-slate-400 hover:text-rose-400 text-xs transition-colors"
+            className="flex items-center gap-1 text-slate-400 hover:text-rose-400 text-xs transition-colors px-2 py-1 rounded-lg hover:bg-white/5 active:scale-95"
             title="Reset Chat"
           >
             <Trash2 className="w-3 h-3" />
@@ -210,7 +212,7 @@ How can I help you breathe easier today?`,
       </div>
 
       {/* Chat Messages Container */}
-      <div className="glass-panel border border-slate-800 rounded-3xl p-4 sm:p-6 min-h-[520px] max-h-[640px] overflow-y-auto flex flex-col space-y-4 shadow-xl">
+      <div className="glass-panel border border-white/10 rounded-[24px] p-4 sm:p-6 min-h-[520px] max-h-[640px] overflow-y-auto flex flex-col space-y-4 shadow-2xl">
         {messages.map((msg) => {
           const isAi = msg.sender === 'assistant';
           return (
@@ -222,10 +224,10 @@ How can I help you breathe easier today?`,
             >
               {/* Avatar */}
               <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-md ${
+                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-md border border-white/10 ${
                   isAi
                     ? 'bg-gradient-to-tr from-cyan-600 to-teal-500 text-slate-950 font-bold'
-                    : 'bg-slate-800 border border-slate-700 text-slate-300'
+                    : 'bg-slate-800 text-slate-300'
                 }`}
               >
                 {isAi ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
@@ -233,16 +235,15 @@ How can I help you breathe easier today?`,
 
               {/* Message Bubble */}
               <div
-                className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                   isAi
-                    ? 'bg-slate-900/90 border border-slate-800 text-slate-200'
-                    : 'bg-cyan-600 text-white font-medium'
+                    ? 'bg-slate-900/90 border border-white/10 text-slate-200'
+                    : 'bg-cyan-600 text-white font-medium border border-cyan-400/30'
                 }`}
               >
                 {/* Text Content */}
                 <div className="prose prose-invert prose-sm max-w-none space-y-2">
                   {msg.text.split('\n\n').map((paragraph, pIdx) => {
-                    // Check if it's a heading
                     if (paragraph.startsWith('### ')) {
                       return (
                         <h3 key={pIdx} className="text-base font-bold text-cyan-300 mt-2 mb-1">
@@ -257,7 +258,6 @@ How can I help you breathe easier today?`,
                         </h4>
                       );
                     }
-                    // Format bullet lists
                     if (paragraph.startsWith('* ') || paragraph.startsWith('- ')) {
                       const bullets = paragraph.split('\n');
                       return (
@@ -272,7 +272,6 @@ How can I help you breathe easier today?`,
                         </ul>
                       );
                     }
-                    // Regular paragraph with bold support
                     return (
                       <p
                         key={pIdx}
@@ -287,12 +286,12 @@ How can I help you breathe easier today?`,
 
                 {/* Bottom Actions for AI messages */}
                 {isAi && (
-                  <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="mt-3 pt-2 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-400">
                     <span className="font-mono text-[10px]">{msg.timestamp}</span>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleCopyText(msg.id, msg.text)}
-                        className="hover:text-cyan-400 flex items-center gap-1 transition-colors"
+                        className="hover:text-cyan-300 flex items-center gap-1 transition-colors active:scale-95"
                         title="Copy to clipboard"
                       >
                         {copiedId === msg.id ? (
@@ -310,8 +309,8 @@ How can I help you breathe easier today?`,
 
                       <button
                         onClick={() => handleSpeechToggle(msg.id, msg.text)}
-                        className={`flex items-center gap-1 transition-colors ${
-                          isSpeaking === msg.id ? 'text-cyan-400 animate-pulse' : 'hover:text-cyan-400'
+                        className={`flex items-center gap-1 transition-colors active:scale-95 ${
+                          isSpeaking === msg.id ? 'text-cyan-300 animate-pulse' : 'hover:text-cyan-300'
                         }`}
                         title="Read aloud"
                       >
@@ -338,7 +337,7 @@ How can I help you breathe easier today?`,
                       <button
                         key={sIdx}
                         onClick={() => handleSendMessage(sug)}
-                        className="text-[11px] bg-slate-800/80 hover:bg-cyan-950/60 border border-slate-700/60 hover:border-cyan-700/60 text-slate-300 hover:text-cyan-300 px-2.5 py-1 rounded-full transition-all text-left flex items-center gap-1"
+                        className="text-[11px] bg-slate-800/80 hover:bg-cyan-950/60 border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-200 px-2.5 py-1 rounded-full transition-all text-left flex items-center gap-1 active:scale-95"
                       >
                         <ArrowRight className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
                         <span>{sug}</span>
@@ -354,10 +353,10 @@ How can I help you breathe easier today?`,
         {/* Loading Indicator */}
         {isLoading && (
           <div className="flex gap-3 self-start max-w-[85%]">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-500 text-slate-950 font-bold flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-500 text-slate-950 font-bold flex items-center justify-center shrink-0 border border-white/10">
               <Bot className="w-4 h-4 animate-spin" />
             </div>
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
               <span className="flex space-x-1">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -378,7 +377,7 @@ How can I help you breathe easier today?`,
             e.preventDefault();
             handleSendMessage();
           }}
-          className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl p-1.5 shadow-lg focus-within:border-cyan-500/60 transition-all"
+          className="flex items-center gap-2 bg-slate-900/90 border border-white/10 rounded-2xl p-1.5 shadow-lg focus-within:border-cyan-400/60 transition-all backdrop-blur-xl"
         >
           <input
             type="text"
@@ -391,7 +390,7 @@ How can I help you breathe easier today?`,
           <button
             type="submit"
             disabled={!inputText.trim() || isLoading}
-            className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all shadow-md shadow-cyan-600/20"
+            className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all shadow-md shadow-cyan-600/20 active:scale-95"
           >
             <span>Ask</span>
             <Send className="w-3.5 h-3.5" />
@@ -406,25 +405,25 @@ How can I help you breathe easier today?`,
           </span>
           <button
             onClick={() => handleSendMessage('Explain the Corsi-Rosenthal DIY Box and CADR rating')}
-            className="shrink-0 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-cyan-300 text-[11px] transition-colors"
+            className="shrink-0 px-2.5 py-1 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/5 hover:border-white/15 text-slate-300 hover:text-cyan-300 text-[11px] transition-all active:scale-95"
           >
             🛠️ Corsi Box DIY
           </button>
           <button
             onClick={() => handleSendMessage('Why is running morning outdoor cardio dangerous during severe smog?')}
-            className="shrink-0 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-cyan-300 text-[11px] transition-colors"
+            className="shrink-0 px-2.5 py-1 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/5 hover:border-white/15 text-slate-300 hover:text-cyan-300 text-[11px] transition-all active:scale-95"
           >
             🏃 Morning Cardio Hazard
           </button>
           <button
             onClick={() => handleSendMessage('How do I seal our bedroom bubble and what air changes do I need?')}
-            className="shrink-0 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-cyan-300 text-[11px] transition-colors"
+            className="shrink-0 px-2.5 py-1 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/5 hover:border-white/15 text-slate-300 hover:text-cyan-300 text-[11px] transition-all active:scale-95"
           >
-            🛏️ Bedroom Clean Air Bubble
+            🛏️ Bedroom Clean Bubble
           </button>
           <button
             onClick={() => handleSendMessage('What are the best indoor plants and do they actually filter PM2.5?')}
-            className="shrink-0 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-cyan-300 text-[11px] transition-colors"
+            className="shrink-0 px-2.5 py-1 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/5 hover:border-white/15 text-slate-300 hover:text-cyan-300 text-[11px] transition-all active:scale-95"
           >
             🪴 Plant Myths vs Reality
           </button>

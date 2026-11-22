@@ -2,15 +2,10 @@ import React, { useState } from 'react';
 import { 
   X, 
   MapPin, 
-  Search, 
-  Plus, 
-  Sparkles, 
-  Wind, 
-  CheckCircle2, 
-  AlertTriangle,
-  Loader2,
-  Radio,
-  Globe
+  Globe, 
+  Loader2, 
+  Radio, 
+  AlertTriangle 
 } from 'lucide-react';
 import { LocationData } from '../types';
 import { searchCityCoordinates, fetchLiveAirAndWeather } from '../services/weatherService';
@@ -70,11 +65,9 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
     setSearchError('');
     
     try {
-      // Use geocoding API to find real coordinates
       const geo = await searchCityCoordinates(query.trim());
       
       if (geo) {
-        // Fetch live data using real coordinates
         const liveData = await fetchLiveAirAndWeather(
           geo.latitude, geo.longitude,
           `${geo.name} - ${geo.region}`,
@@ -94,28 +87,30 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="glass-panel border border-slate-800 rounded-3xl w-full max-w-xl p-6 space-y-6 shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              <MapPin className="w-5 h-5" />
-            </span>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100">
-                Search or Add Hyperlocal Location
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      <div className="glass-panel border border-white/10 rounded-[24px] w-full max-w-xl p-6 space-y-5 shadow-2xl animate-mac-pop">
+        {/* macOS Window Titlebar */}
+        <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08]">
+          <div className="flex items-center gap-3">
+            <div className="mac-traffic-lights">
+              <button type="button" onClick={onClose} className="mac-dot mac-dot-close" title="Close" />
+              <span className="mac-dot mac-dot-minimize" />
+              <span className="mac-dot mac-dot-maximize" />
+            </div>
+            <div className="flex items-center gap-2 ml-2">
+              <span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <MapPin className="w-4 h-4" />
+              </span>
+              <h3 className="text-sm font-bold text-slate-100 tracking-tight">
+                Search or Add Hyperlocal City
               </h3>
-              <p className="text-xs text-slate-400">
-                Monitor live air quality, inversion trapping, and tailored routines for any city.
-              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -123,7 +118,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs">
           <Radio className="w-3.5 h-3.5 text-emerald-400" />
           <span className="text-emerald-300 font-medium">
-            Cities are auto-populated with real-time AQI, weather, and hourly forecast from Open-Meteo Atmospheric Network.
+            Cities are populated with real-time AQI, weather, and hourly forecasts from Open-Meteo.
           </span>
         </div>
 
@@ -137,7 +132,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="e.g. Kolkata, Hanoi, Chicago..."
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-500"
+                className="w-full bg-slate-900/90 border border-white/10 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-400"
                 required
                 disabled={isSearching}
               />
@@ -149,7 +144,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
                 value={customCountry}
                 onChange={(e) => setCustomCountry(e.target.value)}
                 placeholder="e.g. India, Vietnam, USA..."
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-500"
+                className="w-full bg-slate-900/90 border border-white/10 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-400"
                 disabled={isSearching}
               />
             </div>
@@ -165,7 +160,7 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
           <button
             type="submit"
             disabled={isSearching}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold transition-all shadow-md shadow-cyan-600/20 flex items-center justify-center gap-1.5 disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold transition-all shadow-md shadow-cyan-600/20 flex items-center justify-center gap-1.5 disabled:opacity-50 active:scale-98"
           >
             {isSearching ? (
               <>
@@ -181,10 +176,10 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
           </button>
         </form>
 
-        {/* Global Smog Basins Presets */}
-        <div className="space-y-2 border-t border-slate-800/80 pt-4 text-xs">
+        {/* Global Presets */}
+        <div className="space-y-2 border-t border-white/[0.08] pt-4 text-xs">
           <span className="text-slate-400 font-semibold block text-[11px] uppercase tracking-wider">
-            Quick Select Global Winter Inversion Basins (Live Data):
+            Quick Select Global Winter Inversion Hotspots:
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {GLOBAL_SMOG_PRESETS.map((p, idx) => (
@@ -192,15 +187,15 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
                 key={idx}
                 onClick={() => handleSelectPreset(p)}
                 disabled={isSearching}
-                className="p-2.5 rounded-xl bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 text-left transition-all group disabled:opacity-50"
+                className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-cyan-950/40 border border-white/5 hover:border-cyan-500/30 text-left transition-all group disabled:opacity-50 active:scale-95"
               >
-                <div className="font-bold text-slate-200 group-hover:text-cyan-300">
+                <div className="font-bold text-slate-200 group-hover:text-cyan-300 text-xs">
                   {p.name}
                 </div>
                 <div className="text-[10px] text-slate-400">{p.country}</div>
                 <div className="mt-1 flex items-center gap-1 text-[10px]">
                   <Radio className="w-2.5 h-2.5 text-emerald-400" />
-                  <span className="text-emerald-400 font-medium">Live</span>
+                  <span className="text-emerald-400 font-medium">Live Sync</span>
                 </div>
               </button>
             ))}

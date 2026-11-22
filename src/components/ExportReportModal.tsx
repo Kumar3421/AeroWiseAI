@@ -3,18 +3,10 @@ import {
   X, 
   Printer, 
   Download, 
-  FileText, 
-  ShieldCheck, 
-  Activity, 
-  Calendar, 
-  Wind, 
-  CheckCircle2,
-  Copy,
-  Check
+  FileText
 } from 'lucide-react';
 import { LocationData, FamilyProfile } from '../types';
 import { MOCK_ROUTINE_SLOTS } from '../data/mockData';
-import { calculateCigaretteEquivalency } from '../utils/airQualityUtils';
 
 interface ExportReportModalProps {
   isOpen: boolean;
@@ -31,13 +23,10 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
   familyProfile,
   adoptedRoutineIds,
 }) => {
-  const [copied, setCopied] = React.useState<boolean>(false);
-
   if (!isOpen) return null;
 
   const adoptedSlots = MOCK_ROUTINE_SLOTS.filter((s) => adoptedRoutineIds.includes(s.id));
   const totalParticulateSaved = adoptedSlots.reduce((acc, s) => acc + s.lungParticulateSavedUg, 0);
-  const cigarettesDaily = calculateCigaretteEquivalency(location.pm25);
 
   const handleDownloadJSON = () => {
     const reportData = {
@@ -78,34 +67,36 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="glass-panel border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              <FileText className="w-5 h-5" />
-            </span>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100">
-                Family Winter Smog Action Plan & Health Report
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      <div className="glass-panel border border-white/10 rounded-[24px] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl animate-mac-pop">
+        {/* macOS Window Titlebar */}
+        <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08]">
+          <div className="flex items-center gap-3">
+            <div className="mac-traffic-lights">
+              <button type="button" onClick={onClose} className="mac-dot mac-dot-close" title="Close" />
+              <span className="mac-dot mac-dot-minimize" />
+              <span className="mac-dot mac-dot-maximize" />
+            </div>
+            <div className="flex items-center gap-2 ml-2">
+              <span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <FileText className="w-4 h-4" />
+              </span>
+              <h3 className="text-sm font-bold text-slate-100 tracking-tight">
+                Family Smog Plan & Clinical Summary
               </h3>
-              <p className="text-xs text-slate-400">
-                Formatted clinical & routine summary for {familyProfile.name}.
-              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Printable Card Preview */}
-        <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4 text-xs font-sans">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+        <div className="p-5 rounded-2xl bg-slate-900/90 border border-white/10 space-y-4 text-xs font-sans shadow-inner">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] pb-3">
             <div>
               <span className="text-sm font-extrabold text-cyan-300 block">
                 {familyProfile.name}
@@ -125,7 +116,7 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
           </div>
 
           {/* Key Metrics Row */}
-          <div className="grid grid-cols-3 gap-2 text-center py-2 bg-slate-950/60 rounded-xl border border-slate-800/80">
+          <div className="grid grid-cols-3 gap-2 text-center py-2.5 bg-slate-950/70 rounded-xl border border-white/5">
             <div>
               <span className="text-[10px] text-slate-400 block">Particulate Cleared</span>
               <strong className="text-sm font-extrabold text-emerald-400">
@@ -153,7 +144,7 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
             </span>
             <div className="space-y-2">
               {adoptedSlots.map((slot) => (
-                <div key={slot.id} className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1">
+                <div key={slot.id} className="p-2.5 rounded-xl bg-slate-950/80 border border-white/5 space-y-1">
                   <div className="flex justify-between items-center text-[11px]">
                     <span className="font-bold text-cyan-300">{slot.timeWindow} — {slot.title}</span>
                     <span className="text-emerald-400 font-semibold">-{slot.exposureReductionPct}% Exposure</span>
@@ -171,7 +162,7 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
         <div className="flex items-center justify-between pt-2">
           <button
             onClick={handleDownloadJSON}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-white/10 text-xs font-semibold text-slate-200 transition-all active:scale-95"
           >
             <Download className="w-4 h-4 text-cyan-400" />
             <span>Download JSON Data</span>
@@ -180,10 +171,10 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-600/20"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 hover:from-cyan-500 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-cyan-600/20 active:scale-95"
             >
               <Printer className="w-4 h-4" />
-              <span>Print Action Plan</span>
+              <span>Print Plan</span>
             </button>
           </div>
         </div>
