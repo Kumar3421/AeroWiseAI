@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Local binaries & logs
+cloudflared.exe
+*.log
+tunnel.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor directories
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store
