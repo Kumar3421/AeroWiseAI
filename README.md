@@ -1,5 +1,13 @@
 # 🌬️ AeroWise AI — Winter Smog & Community Clean Air Copilot
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://aerowise-ai.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Kumar3421/AeroWiseAI)
+
+> **Live Deployment:** **[https://aerowise-ai.vercel.app](https://aerowise-ai.vercel.app)**  
+> **GitHub Repository:** **[https://github.com/Kumar3421/AeroWiseAI](https://github.com/Kumar3421/AeroWiseAI)**  
+
+---
+
 > **A GenAI-powered environmental health assistant helping families and urban communities navigate severe winter smog, thermal inversions, and hazardous PM2.5 pollution through low-emission daily routines, high-CADR indoor air hacks, sustainable lifestyle alternatives, and transparent direct-impact explainability.**
 
 ---
