@@ -1,12 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
 import { AQIOverviewHeader } from './components/AQIOverviewHeader';
-import { ChatAssistant } from './components/ChatAssistant';
-import { DailyRoutineOptimizer } from './components/DailyRoutineOptimizer';
-import { IAQLab } from './components/IAQLab';
-import { SustainableAlternatives } from './components/SustainableAlternatives';
-import { ImpactCalculator } from './components/ImpactCalculator';
-import { CommunityPods } from './components/CommunityPods';
 import { FamilyProfileModal } from './components/FamilyProfileModal';
 import { SettingsModal } from './components/SettingsModal';
 import { GRAPModal } from './components/GRAPModal';
@@ -17,7 +11,15 @@ import { ExportReportModal } from './components/ExportReportModal';
 import { LocationData, FamilyProfile } from './types';
 import { MOCK_LOCATIONS, DEFAULT_FAMILY_PROFILE } from './data/mockData';
 import { fetchLiveAirAndWeather, CITY_COORDINATES } from './services/weatherService';
-import { Wind, Heart, Sparkles, ShieldCheck } from 'lucide-react';
+import { Wind } from 'lucide-react';
+
+// Code-split dynamic tabs for optimal bundle size & performance
+const ChatAssistant = lazy(() => import('./components/ChatAssistant').then((m) => ({ default: m.ChatAssistant })));
+const DailyRoutineOptimizer = lazy(() => import('./components/DailyRoutineOptimizer').then((m) => ({ default: m.DailyRoutineOptimizer })));
+const IAQLab = lazy(() => import('./components/IAQLab').then((m) => ({ default: m.IAQLab })));
+const SustainableAlternatives = lazy(() => import('./components/SustainableAlternatives').then((m) => ({ default: m.SustainableAlternatives })));
+const ImpactCalculator = lazy(() => import('./components/ImpactCalculator').then((m) => ({ default: m.ImpactCalculator })));
+const CommunityPods = lazy(() => import('./components/CommunityPods').then((m) => ({ default: m.CommunityPods })));
 
 const PROFILE_STORAGE_KEY = 'aerowise_family_profile';
 const ADOPTED_ROUTINES_KEY = 'aerowise_adopted_routines';
@@ -136,6 +138,14 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-white relative">
+      {/* Skip to Main Content Link for Keyboard and Screen Reader Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-cyan-500 focus:text-slate-950 focus:font-bold focus:rounded-xl focus:shadow-2xl focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Ambient Atmospheric Smog & Clean Particle Background */}
       <ParticleBackground aqi={currentLocation.aqi} />
 
@@ -164,56 +174,70 @@ export function App() {
       />
 
       {/* Main Tab Content Area */}
-      <main className="flex-1">
-        {activeTab === 'copilot' && (
-          <ChatAssistant
-            location={currentLocation}
-            familyProfile={familyProfile}
-            onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
-            onSelectTab={setActiveTab}
-          />
-        )}
+      <main
+        id="main-content"
+        role="tabpanel"
+        aria-labelledby={`tab-${activeTab}`}
+        className="flex-1"
+      >
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center min-h-[420px] gap-3">
+              <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
+              <p className="text-xs text-slate-400 font-mono">Loading module...</p>
+            </div>
+          }
+        >
+          {activeTab === 'copilot' && (
+            <ChatAssistant
+              location={currentLocation}
+              familyProfile={familyProfile}
+              onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
+              onSelectTab={setActiveTab}
+            />
+          )}
 
-        {activeTab === 'routine' && (
-          <DailyRoutineOptimizer
-            location={currentLocation}
-            familyProfile={familyProfile}
-            adoptedRoutineIds={adoptedRoutineIds}
-            onToggleAdoptRoutine={toggleAdoptRoutine}
-          />
-        )}
+          {activeTab === 'routine' && (
+            <DailyRoutineOptimizer
+              location={currentLocation}
+              familyProfile={familyProfile}
+              adoptedRoutineIds={adoptedRoutineIds}
+              onToggleAdoptRoutine={toggleAdoptRoutine}
+            />
+          )}
 
-        {activeTab === 'iaq-lab' && (
-          <IAQLab
-            location={currentLocation}
-            familyProfile={familyProfile}
-          />
-        )}
+          {activeTab === 'iaq-lab' && (
+            <IAQLab
+              location={currentLocation}
+              familyProfile={familyProfile}
+            />
+          )}
 
-        {activeTab === 'alternatives' && (
-          <SustainableAlternatives
-            location={currentLocation}
-            familyProfile={familyProfile}
-            adoptedSwapIds={adoptedSwapIds}
-            onToggleAdoptSwap={toggleAdoptSwap}
-          />
-        )}
+          {activeTab === 'alternatives' && (
+            <SustainableAlternatives
+              location={currentLocation}
+              familyProfile={familyProfile}
+              adoptedSwapIds={adoptedSwapIds}
+              onToggleAdoptSwap={toggleAdoptSwap}
+            />
+          )}
 
-        {activeTab === 'impact' && (
-          <ImpactCalculator
-            location={currentLocation}
-            familyProfile={familyProfile}
-            adoptedRoutineCount={adoptedRoutineIds.length}
-            adoptedSwapCount={adoptedSwapIds.length}
-          />
-        )}
+          {activeTab === 'impact' && (
+            <ImpactCalculator
+              location={currentLocation}
+              familyProfile={familyProfile}
+              adoptedRoutineCount={adoptedRoutineIds.length}
+              adoptedSwapCount={adoptedSwapIds.length}
+            />
+          )}
 
-        {activeTab === 'community' && (
-          <CommunityPods
-            location={currentLocation}
-            familyProfile={familyProfile}
-          />
-        )}
+          {activeTab === 'community' && (
+            <CommunityPods
+              location={currentLocation}
+              familyProfile={familyProfile}
+            />
+          )}
+        </Suspense>
       </main>
 
       {/* Footer */}

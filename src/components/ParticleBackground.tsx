@@ -4,7 +4,7 @@ interface ParticleBackgroundProps {
   aqi: number;
 }
 
-export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({ aqi }) => {
+const ParticleBackgroundComponent: React.FC<ParticleBackgroundProps> = ({ aqi }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -94,3 +94,5 @@ export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({ aqi }) =
     />
   );
 };
+
+export const ParticleBackground = React.memo(ParticleBackgroundComponent);

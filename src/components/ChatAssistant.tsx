@@ -26,7 +26,7 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({
   location,
   familyProfile,
   onOpenSettingsModal,
-  onSelectTab,
+  onSelectTab: _onSelectTab,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -105,8 +105,7 @@ How can I help you breathe easier today?`,
       };
 
       setMessages((prev) => [...prev, aiMsg]);
-    } catch (err) {
-      console.error(err);
+    } catch (_err) {
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,
         sender: 'assistant',
@@ -167,6 +166,20 @@ How can I help you breathe easier today?`,
         },
       ]);
     }
+  };
+
+  const renderFormattedText = (text: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong key={i} className="text-slate-100 font-semibold">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
   };
 
   return (
@@ -263,23 +276,17 @@ How can I help you breathe easier today?`,
                       return (
                         <ul key={pIdx} className="list-disc list-inside space-y-1 text-slate-300 my-1">
                           {bullets.map((b, bIdx) => (
-                            <li key={bIdx} dangerouslySetInnerHTML={{
-                              __html: b
-                                .replace(/^[*|-]\s*/, '')
-                                .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-slate-100">$1</strong>')
-                            }} />
+                            <li key={bIdx}>
+                              {renderFormattedText(b.replace(/^[*|-]\s*/, ''))}
+                            </li>
                           ))}
                         </ul>
                       );
                     }
                     return (
-                      <p
-                        key={pIdx}
-                        className="text-slate-300"
-                        dangerouslySetInnerHTML={{
-                          __html: paragraph.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-slate-100">$1</strong>'),
-                        }}
-                      />
+                      <p key={pIdx} className="text-slate-300">
+                        {renderFormattedText(paragraph)}
+                      </p>
                     );
                   })}
                 </div>

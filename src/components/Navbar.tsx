@@ -88,6 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenExportReport}
+            aria-label="Export Plan as PDF or JSON"
             className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-400/20 hover:bg-cyan-500/25 active:scale-95 transition-all text-[11px] font-medium"
           >
             <FileText className="w-3.5 h-3.5 text-cyan-400" />
@@ -96,6 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenGrapModal}
+            aria-label={`View GRAP Stage ${currentLocation.grapStage} emergency measures`}
             className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25 active:scale-95 transition-all text-[11px] font-medium"
           >
             <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
@@ -106,6 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenProfileModal}
+            aria-label={`Configure family health profile for ${familyProfile.name}`}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-full hover:bg-white/[0.06] text-slate-300 hover:text-cyan-300 transition-all text-[11px]"
           >
             <Users className="w-3.5 h-3.5 text-cyan-400" />
@@ -145,6 +148,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative flex items-center bg-slate-900/80 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 hover:border-white/20 transition-all shadow-sm">
             <MapPin className="w-3.5 h-3.5 text-cyan-400 mr-1.5 shrink-0" />
             <select
+              id="city-selector"
+              aria-label="Select Current City Location"
               value={currentLocation.id}
               onChange={(e) => {
                 const found = allLocations.find((l) => l.id === e.target.value);
@@ -213,6 +218,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Settings Button */}
           <button
             onClick={onOpenSettingsModal}
+            aria-label="Configure Gemini API Key & Model Settings"
             title="Configure Gemini API Key & Model Settings"
             className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-white/10 hover:border-white/20 transition-all shadow-sm active:scale-95"
           >
@@ -222,14 +228,18 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Primary Navigation - macOS Native Segmented Control */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-2.5 pt-0.5 overflow-x-auto scrollbar-none">
-        <div className="mac-segmented-track inline-flex items-center gap-1 min-w-full sm:min-w-0">
+      <nav aria-label="Main Application Navigation" className="max-w-7xl mx-auto px-4 sm:px-6 pb-2.5 pt-0.5 overflow-x-auto scrollbar-none">
+        <div role="tablist" aria-label="AeroWise Modules" className="mac-segmented-track inline-flex items-center gap-1 min-w-full sm:min-w-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={isActive}
+                aria-controls={`tabpanel-${tab.id}`}
                 onClick={() => onSelectTab(tab.id)}
                 className={`mac-segmented-item flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap ${
                   isActive
@@ -243,7 +253,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             );
           })}
         </div>
-      </div>
+      </nav>
     </header>
   );
 };

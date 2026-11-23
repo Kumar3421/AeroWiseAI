@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   Wind, 
   Cigarette, 
@@ -10,7 +10,6 @@ import {
   CheckCircle2, 
   XCircle, 
   AlertCircle,
-  HelpCircle,
   Activity
 } from 'lucide-react';
 import { LocationData, FamilyProfile } from '../types';
@@ -26,14 +25,20 @@ interface AQIOverviewHeaderProps {
   familyProfile: FamilyProfile;
 }
 
-export const AQIOverviewHeader: React.FC<AQIOverviewHeaderProps> = ({
+const AQIOverviewHeaderComponent: React.FC<AQIOverviewHeaderProps> = ({
   location,
   familyProfile,
 }) => {
   const aqiColors = getAQIColorClasses(location.aqi);
   const aqiLabel = getAQILabel(location.aqi);
-  const cigarettesDaily = calculateCigaretteEquivalency(location.pm25);
-  const inversion = getThermalInversionExplanation(location.temperature, location.windSpeed);
+  const cigarettesDaily = useMemo(
+    () => calculateCigaretteEquivalency(location.pm25),
+    [location.pm25]
+  );
+  const inversion = useMemo(
+    () => getThermalInversionExplanation(location.temperature, location.windSpeed),
+    [location.temperature, location.windSpeed]
+  );
 
   // Find safest ventilation hour
   const safeHour = location.hourlyForecast.find(h => h.safeToVentilate);
@@ -45,7 +50,10 @@ export const AQIOverviewHeader: React.FC<AQIOverviewHeaderProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: Live AQI & Critical Status */}
-          <div className={`p-4 rounded-2xl border ${aqiColors.border} ${aqiColors.bg} flex flex-col justify-between relative overflow-hidden`}>
+          <div
+            aria-live="polite"
+            className={`p-4 rounded-2xl border ${aqiColors.border} ${aqiColors.bg} flex flex-col justify-between relative overflow-hidden`}
+          >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Gauge className="w-3.5 h-3.5 text-cyan-400" />
@@ -276,3 +284,5 @@ export const AQIOverviewHeader: React.FC<AQIOverviewHeaderProps> = ({
     </div>
   );
 };
+
+export const AQIOverviewHeader = React.memo(AQIOverviewHeaderComponent);

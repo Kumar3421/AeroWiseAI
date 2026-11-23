@@ -51,6 +51,7 @@ export function triggerConfetti() {
   let frameCount = 0;
 
   function render() {
+    if (!ctx) return;
     frameCount++;
     ctx.clearRect(0, 0, width, height);
 
