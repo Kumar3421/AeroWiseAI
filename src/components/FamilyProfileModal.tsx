@@ -64,8 +64,9 @@ export const FamilyProfileModal: React.FC<FamilyProfileModalProps> = ({
           {/* Family Name & Member Count */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-slate-400 block mb-1 font-semibold">Household Name / Label:</label>
+              <label htmlFor="household-name" className="text-slate-400 block mb-1 font-semibold">Household Name / Label:</label>
               <input
+                id="household-name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -74,8 +75,9 @@ export const FamilyProfileModal: React.FC<FamilyProfileModalProps> = ({
               />
             </div>
             <div>
-              <label className="text-slate-400 block mb-1 font-semibold">Number of Residents:</label>
+              <label htmlFor="household-residents" className="text-slate-400 block mb-1 font-semibold">Number of Residents:</label>
               <input
+                id="household-residents"
                 type="number"
                 min="1"
                 max="15"

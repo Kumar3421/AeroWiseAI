@@ -136,11 +136,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <form onSubmit={handleSave} className="space-y-4 text-xs">
           {/* Gemini API Key */}
           <div>
-            <label className="text-slate-300 block mb-1 font-semibold flex items-center gap-1.5">
+            <label htmlFor="gemini-api-key" className="text-slate-300 block mb-1 font-semibold flex items-center gap-1.5">
               <Key className="w-3.5 h-3.5 text-cyan-400" />
               <span>Google Gemini API Key (Optional):</span>
             </label>
             <input
+              id="gemini-api-key"
               type="password"
               value={keyInput}
               onChange={(e) => setKeyInput(e.target.value)}
@@ -175,11 +176,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Google Maps / Air Quality API Key */}
           <div className="pt-2 border-t border-white/[0.08]">
-            <label className="text-slate-300 block mb-1 font-semibold flex items-center gap-1.5">
+            <label htmlFor="google-maps-api-key" className="text-slate-300 block mb-1 font-semibold flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 text-teal-400" />
               <span>Google Maps Platform API Key (Optional):</span>
             </label>
             <input
+              id="google-maps-api-key"
               type="password"
               value={mapsKeyInput}
               onChange={(e) => setMapsKeyInput(e.target.value)}

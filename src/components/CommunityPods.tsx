@@ -240,8 +240,9 @@ export const CommunityPods: React.FC<CommunityPodsProps> = ({
 
           <form onSubmit={handleReportFire} className="space-y-3 text-xs">
             <div>
-              <label className="text-slate-400 block mb-1">Type of Air Violation:</label>
+              <label htmlFor="violation-type" className="text-slate-400 block mb-1">Type of Air Violation:</label>
               <select
+                id="violation-type"
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
                 className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-slate-200 outline-none focus:border-cyan-500"
@@ -254,8 +255,9 @@ export const CommunityPods: React.FC<CommunityPodsProps> = ({
             </div>
 
             <div>
-              <label className="text-slate-400 block mb-1">Location or Landmark:</label>
+              <label htmlFor="violation-location" className="text-slate-400 block mb-1">Location or Landmark:</label>
               <input
+                id="violation-location"
                 type="text"
                 value={reportLocation}
                 onChange={(e) => setReportLocation(e.target.value)}
@@ -266,8 +268,9 @@ export const CommunityPods: React.FC<CommunityPodsProps> = ({
             </div>
 
             <div>
-              <label className="text-slate-400 block mb-1">Optional Details or Severity:</label>
+              <label htmlFor="violation-details" className="text-slate-400 block mb-1">Optional Details or Severity:</label>
               <textarea
+                id="violation-details"
                 value={reportNotes}
                 onChange={(e) => setReportNotes(e.target.value)}
                 placeholder="Dense black smoke blowing towards primary school building..."

@@ -171,7 +171,7 @@ export const IAQLab: React.FC<IAQLabProps> = ({
 
               {/* Fan Speed Selection */}
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-400 block">Box Fan Operating Speed:</label>
+                <span className="text-xs text-slate-400 block font-medium">Box Fan Operating Speed:</span>
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   {(['low', 'med', 'high'] as const).map((spd) => (
                     <button

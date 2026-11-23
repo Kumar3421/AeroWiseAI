@@ -126,8 +126,9 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
         <form onSubmit={handleCreateCustom} className="space-y-4 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-slate-400 block mb-1 font-semibold">City Name:</label>
+              <label htmlFor="search-city-name" className="text-slate-400 block mb-1 font-semibold">City Name:</label>
               <input
+                id="search-city-name"
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -138,8 +139,9 @@ export const CitySearchModal: React.FC<CitySearchModalProps> = ({
               />
             </div>
             <div>
-              <label className="text-slate-400 block mb-1 font-semibold">Country / State (Optional):</label>
+              <label htmlFor="search-country-name" className="text-slate-400 block mb-1 font-semibold">Country / State (Optional):</label>
               <input
+                id="search-country-name"
                 type="text"
                 value={customCountry}
                 onChange={(e) => setCustomCountry(e.target.value)}
