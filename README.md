@@ -2,7 +2,7 @@
 
 [![Live Deployment](https://img.shields.io/badge/Live%20Demo-Vercel-black?style=flat&logo=vercel)](https://aerowise-ai.vercel.app)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repo-181717?style=flat&logo=github)](https://github.com/Kumar3421/AeroWiseAI)
-[![Tests Passing](https://img.shields.io/badge/Tests-44%20Passing-emerald?style=flat)](https://github.com/Kumar3421/AeroWiseAI)
+[![Tests Passing](https://img.shields.io/badge/Tests-55%20Passing-emerald?style=flat)](https://github.com/Kumar3421/AeroWiseAI)
 [![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue?style=flat)](https://github.com/Kumar3421/AeroWiseAI)
 
 - **Live Application:** [https://aerowise-ai.vercel.app](https://aerowise-ai.vercel.app)
@@ -32,6 +32,37 @@ Winter atmospheric stagnation creates ground-level temperature inversions that t
 - **Clean Alternatives Hub:** Practical swaps for open biomass burning, indoor cooking fumes, and cold-start vehicular emissions.
 - **Impact & Health Calculator:** Quantitative estimation of avoided PM2.5 inhalation and neighborhood emissions reductions.
 - **Community Pods:** Hyperlocal coordination for school carpools, bulk filter material purchasing, and illegal open fire reporting.
+
+```mermaid
+flowchart TD
+    subgraph External_APIs["External Atmospheric & GenAI Services"]
+        OM["Open-Meteo Air Quality & Weather API\n(PM2.5, PM10, NO2, SO2, Wind, Temp)"]
+        GEO["Geocoding API\n(Worldwide City Coordinates)"]
+        GEM["Google Gemini 1.5 Flash API\n(Contextual Pulmonology & Physics Logic)"]
+    end
+
+    subgraph Client_App["AeroWise AI Client Engine (React 18 + Vite)"]
+        WS["Weather & Inversion Service\n(weatherService.ts)"]
+        SEC["Input Sanitizer & XSS Defense\n(sanitize.ts)"]
+        LS[("Client LocalStorage\nZero-Telemetry Key & Profile Store")]
+        
+        subgraph Core_Modules["Core Dynamic Modules (Code-Split)"]
+            COP["AI Smog Copilot"]
+            ROUT["24-Hour Routine Optimizer"]
+            IAQ["IAQ Lab & DIY CADR Simulator"]
+            ALT["Clean Alternatives Hub"]
+            IMP["Direct Impact Engine"]
+            PODS["Community Defense Pods"]
+        end
+    end
+
+    OM --> WS
+    GEO --> WS
+    GEM <--> COP
+    WS --> Core_Modules
+    LS <--> Core_Modules
+    SEC --> COP
+```
 
 ---
 
